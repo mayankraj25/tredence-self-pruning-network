@@ -24,32 +24,30 @@ A feed-forward neural network that **learns to prune itself during training** by
 # Install dependencies
 pip install -r requirements.txt
 
-# Run all three λ experiments (30 epochs each)
-python self_pruning_cifar10.py --lambdas 1e-4 5e-4 2e-3 --epochs 30
+# Run all three λ experiments (50 epochs each)
+python self_pruning_cifar10.py --lambdas 0.5 2.0 5.0 --epochs 50
 
 # Custom run
-python self_pruning_cifar10.py --lambdas 1e-4 5e-4 2e-3 --epochs 50 --batch 128 --out_dir ./my_outputs
+python self_pruning_cifar10.py --lambdas 0.5 2.0 5.0 --epochs 50 --batch 128 --out_dir ./my_outputs
 ```
 
 ## Key Concepts
 
 | Component | Description |
 |-----------|-------------|
-| `PrunableLinear` | Custom layer with `gate_scores` parameter per weight; gates = sigmoid(gate_scores) |
-| Sparsity Loss | L1 norm of all gate values — constant gradient pushes gates to exactly 0 |
+| `PrunableLinear` | Custom layer with `gate_scores` parameter per weight; gates = clamp(gate_scores, 0, 1) |
+| Sparsity Loss | Mean gate value across all layers — normalised L1 penalty pushes gates to exactly 0 |
 | Total Loss | `CrossEntropy + λ × SparsityLoss` |
-| λ sweep | Low (1e-4) / Medium (5e-4) / High (2e-3) to show sparsity–accuracy trade-off |
+| λ sweep | Low (0.5) / Medium (2.0) / High (5.0) to show sparsity–accuracy trade-off |
 
 ## Results
 
 | Lambda (λ) | Test Accuracy | Sparsity (%) |
 |:----------:|:-------------:|:------------:|
-| 1e-4 | ~53% | ~20% |
-| 5e-4 | ~50% | ~58% |
-| 2e-3 | ~43% | ~80% |
-
-*(Fill in your actual numbers after running the script.)*
+| 0.5 | 60.91% | 93.32% |
+| 2.0 | 60.78% | 93.98% |
+| 5.0 | 60.41% | 94.84% |
 
 ## Hardware
 
-Auto-detects CUDA → MPS → CPU. 30 epochs on CPU ≈ 15–25 min. On GPU < 5 min.
+Auto-detects CUDA → MPS → CPU. 50 epochs on M3 Mac ≈ 7 min per run.
